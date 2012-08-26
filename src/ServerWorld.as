@@ -1,6 +1,8 @@
 package  
 {
 	import Customer;
+	import flash.utils.getTimer;
+	import net.flashpunk.FP;
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.graphics.Text;
@@ -17,8 +19,11 @@ package
 	 */
 	public class ServerWorld extends World 
 	{
-		[Embed(source = "../Background.png")]
-		public static const Background:Class;
+		[Embed(source="../TastingRoomBackground.png")]
+		public static const TastingRoomBackground:Class;
+		
+		[Embed(source = "../HomebrewBackground.png")]
+		public static const HomebrewBackground:Class;
 		
 		[Embed(source = "../GameOverScreen.png")]
 		public static const GameOverScreen:Class;
@@ -62,68 +67,92 @@ package
 		private var TargetScore_:Number;
 		
 		private var ServerEntity_:Entity;
+		
+		private var StartTime_:int;
 			
 		public function ServerWorld() 
 		{
-			BackgroundEntity_ = new Entity(0, 0, new Image(Background));
+			BackgroundEntity_ = new Entity(0, 0, new Image(TastingRoomBackground));
 			add(BackgroundEntity_);
 			
 			GameOverEntity = new Entity(0, 0, new Image(GameOverScreen));
 			
-			
+			// Initialize all the stuff, but don't add; this is done in changeLevel
 			RedTap_ = new Entity(70, 80, new Image(RedTapImage));
 			RedTap_.type = "red_tap";
 			RedTap_.setHitbox(32, 32);
-			add(RedTap_);
-			
+						
 			BlackTap_ = new Entity(102, 80, new Image(BlackTapImage));
 			BlackTap_.type = "black_tap";
 			BlackTap_.setHitbox(32, 32);
-			add(BlackTap_);
-					
+								
 			YellowTap_ = new Entity(134, 80, new Image(YellowTapImage));
 			YellowTap_.type = "yellow_tap";
 			YellowTap_.setHitbox(32, 32);
-			add(YellowTap_);
-			
+						
 			CurrentMug_ = new BeerMug();
 			CustomerTween_ = new Tween(4, Tween.PERSIST, addCustomer);
-			addTween(CustomerTween_);
-			
 			FadeTween_ = new ColorTween(fadeDone);
-			addTween(FadeTween_);
-			
-			TimeoutTween = new Tween(60, Tween.PERSIST, timeoutHappened);
-			addTween(TimeoutTween);
-			
-			CurrentScore_ = 0;
-			TargetScore_ = 20;
-			CurrentTime = 0;
-			
+										
 			TheBar_ = new Entity(0, 141);
 			TheBar_.setHitbox(231, 56);
 			TheBar_.type = "bar";
-			add(TheBar_);
-			
+						
 			TheFloor_ = new Entity(0, 197);
 			TheFloor_.setHitbox(320, 240 - 197);
 			TheFloor_.type = "floor";
-			add(TheFloor_);
-			
+						
 			ScoreText_ = new Text("Score: 0", 0, 0);
 			ScoreText_.color = 0xffffffff;
 			
 			ScoreEntity_ = new Entity(0, 220, ScoreText_);
-			add(ScoreEntity_);
-			
 			ServerEntity_ = new Entity(0, 47, new Image(ServerImage));
+			
+			
+			// seed random generator
+			FP.randomizeSeed();
+			changeLevel("TastingRoom");
+						
+		}
+		
+		public function changeLevel(LevelName:String):void
+		{
+			if (LevelName == "Homebrew") {
+				add(RedTap_);
+				add(BlackTap_);
+				CustomerTween_ = new Tween(4, Tween.PERSIST, addCustomer);
+			} else if (LevelName == "TastingRoom") {
+				add(RedTap_);
+				add(BlackTap_);
+				add(YellowTap_);
+				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
+			}
+			
+			TimeoutTween = new Tween(60, Tween.PERSIST, timeoutHappened);
+			
+			// This stuff is in every level
+			addTween(CustomerTween_);
+			addTween(FadeTween_);
+			addTween(TimeoutTween);
+			add(TheFloor_);
+			add(ScoreEntity_);
 			add(ServerEntity_);
+			add(TheBar_);
+			
+			// Initialize scores / timeouts			
+			CurrentScore_ = 0;
+			TargetScore_ = 10;
+			CurrentTime = 0;
+			
+			StartTime_ = 0;
 		}
 		
 		override public function begin():void
 		{
 			TimeoutTween.start();
 			CustomerTween_.start();
+			
+			StartTime_ = flash.utils.getTimer();
 		}
 		
 		public function timeoutHappened():void
@@ -152,6 +181,14 @@ package
 		{
 			FadeTween_.cancel();
 			remove(Customer_);
+			
+			// Reactivate tap when we remove mug
+			//switch(CurrentMug_.BeerType) {
+			//case "ipa": RedTap_.collidable = true;  break;
+			//case "stout": BlackTap_.collidable = true;  break;
+			//case "pils": YellowTap_.collidable = true; break;
+			//default:
+			//}
 			remove(CurrentMug_);
 		}
 		
@@ -175,6 +212,8 @@ package
 					CurrentMug_.y = 108;
 					CurrentMug_.fillBeer("ipa");
 					add(CurrentMug_);
+					
+					//RedTap_.collidable = false;
 				}
 				
 				if (collidePoint("black_tap", mouseX, mouseY)) {
@@ -183,6 +222,8 @@ package
 					CurrentMug_.y = 108;
 					CurrentMug_.fillBeer("stout");
 					add(CurrentMug_);
+					
+					//BlackTap_.collidable = false;
 				}
 				
 				if (collidePoint("yellow_tap", mouseX, mouseY)) {
@@ -191,6 +232,8 @@ package
 					CurrentMug_.y = 108;
 					CurrentMug_.fillBeer("pils");
 					add(CurrentMug_);
+					
+					//YellowTap_.collidable = false;
 				}
 				
 				if (FadeTween_.active) {
@@ -242,7 +285,8 @@ package
 			}
 			
 			// Update score text
-			ScoreText_.text = "Score: " + CurrentScore_ + ", Target: " + TargetScore_ + ", Time: " + Math.floor(1.0 / TimeoutTween.percent);
+			ScoreText_.text = "Score: " + CurrentScore_ + ", Target: " + TargetScore_ 
+			+ ", Time: " + Math.floor((getTimer() - StartTime_ )/1000);
 		}
 	}
 

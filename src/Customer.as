@@ -1,5 +1,6 @@
 package  
 {
+	import net.flashpunk.FP;
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.tweens.misc.ColorTween;
@@ -26,13 +27,15 @@ package
 		private var LikedBeerType_:String;
 		private var MoveTween_:LinearMotion;
 		private var FadeTween_:ColorTween;
+		private const VelocityX_:Number = 75;
+		private const XLimit_:Number = 200;
 		
 		private var OldX_:int;
 		private var OldY_:int;
 		
 		public function Customer() 
 		{
-			var RandNum:int = Math.floor(Math.random() * 3);
+			var RandNum:int = FP.rand(3); //Math.floor(Math.random() * 3);
 			switch(RandNum) {
 				case 0:
 					CustImage_ = new Image(HopbroImageEmbed);
@@ -61,8 +64,8 @@ package
 		
 		public function slideCustomer():void
 		{
-			MoveTween_.setMotion(x, y, 200, y, 0.5);
-			MoveTween_.start();
+			//MoveTween_.setMotion(x, y, 200, y, 0.5);
+			//MoveTween_.start();
 		}
 		
 		private function moveDone():void
@@ -82,12 +85,17 @@ package
 		
 		override public function update():void
 		{
-			if (MoveTween_.active) {
-				OldX_ = x;
-				OldY_ = y;
-				x = MoveTween_.x;
-				y = MoveTween_.y;
-			}
+			//if (MoveTween_.active) {
+				//OldX_ = x;
+				//OldY_ = y;
+				//x = MoveTween_.x;
+				//y = MoveTween_.y;
+			//}
+			
+			OldX_ = x;
+			OldY_ = y;
+			x = OldX_ - (VelocityX_ * FP.elapsed);
+			if (x < XLimit_ ) x = OldX_;
 			
 			if (collide("customer", x, y)) {
 				x = OldX_;
@@ -105,8 +113,8 @@ package
 		public function giveBeer(BeerGlass:BeerMug):Boolean
 		{
 			//BeerGlass.sendDownBar();
-			//FadeTween_.tween(0.3, 0xffffffff, 0xfffffff, 1.0, 0.0001);
-			//FadeTween_.start();
+			FadeTween_.tween(0.3, 0xffffffff, 0xfffffff, 1.0, 0.0001);
+			FadeTween_.start();
 			
 			if (BeerGlass.BeerType == LikedBeerType_) {
 				return true;
