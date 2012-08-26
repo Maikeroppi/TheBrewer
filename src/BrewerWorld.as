@@ -169,6 +169,7 @@ package
 			// seed random generator
 			FP.randomizeSeed();
 			changeLevel("Homebrew");
+			//changeLevel("Microbrewery");
 						
 			// Add them tweens
 			//addTween(CustomerTween_);
@@ -207,7 +208,7 @@ package
 				NumBeers_ = 4;
 				TargetScore_ = 20;
 				Timeout_ = 60;
-				CustomerTween_ = new Tween(1, Tween.PERSIST, addCustomer);
+				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
 				BackgroundEntity_.graphic = new Image(MicrobreweryBackground);
 			}
 			
@@ -244,7 +245,7 @@ package
 			if(CurrentScore_ < TargetScore_) {
 				setTransitionTextCentered("Game is Over");
 			} else {
-				if (CurrentLevel_ == "TastingRoom") {
+				if (CurrentLevel_ == "Microbrewery") {
 					setTransitionTextCentered("You are a master brewer!");
 				} else {
 					setTransitionTextCentered("Success! Next level...");
@@ -269,6 +270,7 @@ package
 			if (CurrentLevel_ == "Homebrew") {
 				changeLevel("TastingRoom");
 			} else if (CurrentLevel_ == "TastingRoom") {
+				changeLevel("Microbrewery");
 			}
 			
 		}
