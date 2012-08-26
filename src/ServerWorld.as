@@ -50,6 +50,7 @@ package
 		private var YellowTap_:Entity;
 		
 		private var CurrentMug_:BeerMug;
+		private var CurrentLevel_:String;
 		
 		private var CustomerTween_:Tween;
 		private var Customer_:Customer;
@@ -138,6 +139,7 @@ package
 		public function changeLevel(LevelName:String):void
 		{
 			add(BackgroundEntity_);
+			CurrentLevel_ = LevelName;
 			if (LevelName == "Homebrew") {
 				add(RedTap_);
 				add(BlackTap_);
@@ -188,23 +190,35 @@ package
 			
 			removeAll();
 			if(CurrentScore_ < TargetScore_) {
-				TransitionText_.text = "Game is Over";
+				setTransitionTextCentered("Game is Over");
 			} else {
-				TransitionText_.text = "Success! Next level...";
-			}
+				if (CurrentLevel_ == "TastingRoom") {
+					setTransitionTextCentered("You are a master brewer!");
+				} else {
+					setTransitionTextCentered("Success! Next level...");
+					TransitionTween_.start();
+				}
+			}		
 			
+			add(TransitionEntity);
+			add(TransitionTextEntity_);						
+		}
+		
+		public function setTransitionTextCentered(TheText:String):void
+		{
+			TransitionText_.text = TheText;
 			TransitionText_.x = (FP.screen.width / 2) - (TransitionText_.width / 2);
 			TransitionText_.y = (FP.screen.height / 2) - (TransitionText_.height / 2);
-			add(TransitionEntity);
-			add(TransitionTextEntity_);
-			
-			TransitionTween_.start();			
 		}
 		
 		public function transition():void
 		{
 			removeAll();
-			changeLevel("TastingRoom");
+			if (CurrentLevel_ == "Homebrew") {
+				changeLevel("TastingRoom");
+			} else if (CurrentLevel_ == "TastingRoom") {
+			}
+			
 		}
 		
 		public function addCustomer():void 
