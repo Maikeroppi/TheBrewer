@@ -27,6 +27,9 @@ package
 		[Embed(source = "../HomebrewBackground.png")]
 		public static const HomebrewBackground:Class;
 		
+		[Embed(source = "../MicrobreweryBackground.png")]
+		public static const MicrobreweryBackground:Class;
+		
 		[Embed(source="../Blackscreen.png")]
 		public static const TransitionScreen:Class;
 		public var TransitionEntity:Entity;
@@ -39,6 +42,12 @@ package
 		
 		[Embed(source = "../YellowTap.png")]
 		public static const YellowTapImage:Class;
+		
+		[Embed(source = "../BrownTap.png")]
+		public static const BrownTapImage:Class;
+		
+		[Embed(source = "../OrangeTap.png")]
+		public static const OrangeTapImage:Class;
 		
 		[Embed(source = "../Server.png")]
 		public static const ServerImage:Class;
@@ -67,6 +76,8 @@ package
 		private var BlackTap_:Entity;
 		private var RedTap_:Entity;
 		private var YellowTap_:Entity;
+		private var BrownTap_:Entity;
+		private var OrangeTap_:Entity;
 		
 		private var CurrentMug_:BeerMug;
 		private var CurrentLevel_:String;
@@ -117,6 +128,14 @@ package
 			YellowTap_ = new Entity(134, 80, new Image(YellowTapImage));
 			YellowTap_.type = "yellow_tap";
 			YellowTap_.setHitbox(32, 32);
+			
+			BrownTap_ = new Entity(166, 80, new Image(BrownTapImage));
+			BrownTap_.type = "brown_tap";
+			BrownTap_.setHitbox(32, 32);
+			
+			OrangeTap_ = new Entity(198, 80, new Image(OrangeTapImage));
+			OrangeTap_.type = "orange_tap";
+			OrangeTap_.setHitbox(32, 32);
 						
 			CurrentMug_ = new BeerMug();
 			CustomerTween_ = new Tween(4, Tween.PERSIST, addCustomer);
@@ -150,7 +169,7 @@ package
 			// seed random generator
 			FP.randomizeSeed();
 			changeLevel("Homebrew");
-			
+						
 			// Add them tweens
 			//addTween(CustomerTween_);
 			addTween(FadeTween_);
@@ -179,6 +198,17 @@ package
 				Timeout_ = 40;
 				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
 				BackgroundEntity_.graphic = new Image(TastingRoomBackground);
+			} else if (LevelName == "Microbrewery") {
+				add(RedTap_);
+				add(BlackTap_);
+				add(YellowTap_);
+				add(BrownTap_);
+				//add(OrangeTap_);
+				NumBeers_ = 4;
+				TargetScore_ = 20;
+				Timeout_ = 60;
+				CustomerTween_ = new Tween(1, Tween.PERSIST, addCustomer);
+				BackgroundEntity_.graphic = new Image(MicrobreweryBackground);
 			}
 			
 			//TimeoutTween = new Tween(Timeout_, Tween.PERSIST, timeoutHappened);
@@ -245,10 +275,12 @@ package
 		
 		public function addCustomer():void 
 		{
+			var CustVec:Vector.<Customer> = new Vector.<Customer>();
+			getType("customer", CustVec);
 			Customer_ = new Customer();
 			Customer_.setHitbox(64, 128);
 			Customer_.type = "customer";
-			Customer_.x = 330;
+			Customer_.x = 330 + (CustVec.length * 128);
 			Customer_.y = 74;
 			Customer_.slideCustomer();
 			
@@ -263,6 +295,12 @@ package
 					
 				case 2:
 					Customer_.SetBeerType("pils");
+					break;
+				case 3:
+					Customer_.SetBeerType("brown");
+					break;
+				case 4:
+					Customer_.SetBeerType("oktober");
 					break;
 			}
 						
@@ -333,6 +371,26 @@ package
 					//YellowTap_.collidable = false;
 				}
 				
+				if (collidePoint("brown_tap", mouseX, mouseY)) {
+					CurrentMug_ = new BeerMug();
+					CurrentMug_.x = 166;
+					CurrentMug_.y = 108;
+					CurrentMug_.fillBeer("brown");
+					add(CurrentMug_);
+					
+					//YellowTap_.collidable = false;
+				}
+				
+				if (collidePoint("orange_tap", mouseX, mouseY)) {
+					CurrentMug_ = new BeerMug();
+					CurrentMug_.x = 198;
+					CurrentMug_.y = 108;
+					CurrentMug_.fillBeer("oktober");
+					add(CurrentMug_);
+					
+					//YellowTap_.collidable = false;
+				}
+				
 				if (FadeTween_.active) {
 					Customer_.setAlpha(FadeTween_.alpha);
 				}
@@ -368,7 +426,7 @@ package
 				
 				// Mug hit bar
 				if (Mug.collide("bar", Mug.x, Mug.y)) {
-					Mug.y = Mug.PerviousY;
+					Mug.y = TheBar_.y - Mug.height;
 				}
 				
 				// Mug hit the floor

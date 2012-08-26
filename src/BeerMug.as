@@ -37,6 +37,8 @@ package
 			BeersMap_.add("ipa", [1]);
 			BeersMap_.add("stout", [2]);
 			BeersMap_.add("pils", [3]);
+			BeersMap_.add("brown", [4]);
+			BeersMap_.add("oktober", [5]);
 			BeersMap_.play("empty");
 			graphic = BeersMap_;
 			

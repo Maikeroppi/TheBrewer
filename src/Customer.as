@@ -23,6 +23,14 @@ package
 		[Embed(source = "../Pilsnerguy.png")]
 		public static const PilsnerguyImageEmbed:Class;
 		
+		[Embed(source = "../MisterBrown.png")]
+		public static const MisterBrownImageEmbed:Class;
+				
+		[Embed(source = "../OktoberMan.png")]
+		public static const OktoberManImageEmbed:Class;
+		
+		
+		
 		private var CustImage_:Image;
 		private var LikedBeerType_:String;
 		private var MoveTween_:LinearMotion;
@@ -34,9 +42,7 @@ package
 		private var OldY_:int;
 		
 		public function Customer() 
-		{
-			
-			
+		{			
 			MoveTween_ = new LinearMotion(moveDone);
 			addTween(MoveTween_);
 			
@@ -59,6 +65,12 @@ package
 			case "pils":
 				graphic = new Image(PilsnerguyImageEmbed);
 			break;
+			case "brown":
+				graphic = new Image(MisterBrownImageEmbed);
+			break;
+			case "oktober":
+				graphic = new Image(OktoberManImageEmbed);
+				break;
 			default:
 				trace("Unknown BeerType in Customer.SetBeerType!");
 			}
