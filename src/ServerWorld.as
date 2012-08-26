@@ -71,6 +71,9 @@ package
 		
 		private var TransitionText_:Text;
 		private var TransitionTextEntity_:Entity;
+		private var TransitionTween_:Tween;
+		
+		private var Timeout_:int;
 			
 		public function ServerWorld() 
 		{
@@ -115,55 +118,67 @@ package
 			TransitionText_.size = 20;
 			TransitionTextEntity_ = new Entity(0, 0, TransitionText_);
 			
+			TransitionTween_ = new Tween(2, Tween.PERSIST, transition);
+			addTween(TransitionTween_);
+			
 			NumBeers_ = 0;
 			
 			
 			// seed random generator
 			FP.randomizeSeed();
-			changeLevel("TastingRoom");
+			changeLevel("Homebrew");
+			
+			// Add them tweens
+			//addTween(CustomerTween_);
+			addTween(FadeTween_);
+			//addTween(TimeoutTween);
 						
 		}
 		
 		public function changeLevel(LevelName:String):void
 		{
+			add(BackgroundEntity_);
 			if (LevelName == "Homebrew") {
 				add(RedTap_);
 				add(BlackTap_);
 				NumBeers_ = 2;
-				CustomerTween_ = new Tween(4, Tween.PERSIST, addCustomer);
+				CustomerTween_ = new Tween(3, Tween.PERSIST, addCustomer);
+				TargetScore_ = 10;
+				Timeout_ = 40;
+				BackgroundEntity_.graphic = new Image(HomebrewBackground);
 			} else if (LevelName == "TastingRoom") {
 				add(RedTap_);
 				add(BlackTap_);
 				add(YellowTap_);
 				NumBeers_ = 3;
+				TargetScore_ = 15;
+				Timeout_ = 40;
 				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
+				BackgroundEntity_.graphic = new Image(TastingRoomBackground);
 			}
 			
-			TimeoutTween = new Tween(40, Tween.PERSIST, timeoutHappened);
-			
+			//TimeoutTween = new Tween(Timeout_, Tween.PERSIST, timeoutHappened);
+			StartTime_ = getTimer();
+						
 			// This stuff is in every level
-			addTween(CustomerTween_);
-			addTween(FadeTween_);
-			addTween(TimeoutTween);
+			addTween(CustomerTween_, true);
+						
 			add(TheFloor_);
 			add(ScoreEntity_);
 			add(ServerEntity_);
 			add(TheBar_);
 			
-			// Initialize scores / timeouts			
+			// Initialize scores	
 			CurrentScore_ = 0;
-			TargetScore_ = 10;
-			CurrentTime = 0;
-			
-			StartTime_ = 0;
 		}
 		
 		override public function begin():void
 		{
-			TimeoutTween.start();
-			CustomerTween_.start();
-			
-			StartTime_ = flash.utils.getTimer();
+			//TimeoutTween.start();
+			//CustomerTween_.start();
+			//
+			//StartTime_ = flash.utils.getTimer();
+			super.begin();
 		}
 		
 		public function timeoutHappened():void
@@ -175,13 +190,21 @@ package
 			if(CurrentScore_ < TargetScore_) {
 				TransitionText_.text = "Game is Over";
 			} else {
-				TransitionText_.text = "Sucess! Next level...";
+				TransitionText_.text = "Success! Next level...";
 			}
 			
 			TransitionText_.x = (FP.screen.width / 2) - (TransitionText_.width / 2);
 			TransitionText_.y = (FP.screen.height / 2) - (TransitionText_.height / 2);
 			add(TransitionEntity);
 			add(TransitionTextEntity_);
+			
+			TransitionTween_.start();			
+		}
+		
+		public function transition():void
+		{
+			removeAll();
+			changeLevel("TastingRoom");
 		}
 		
 		public function addCustomer():void 
@@ -285,9 +308,7 @@ package
 						//CurrentScore_ -= 1 ;
 					//}
 					//FadeTween_.tween(0.5, 0xffffffff, 0xfffffff, 1.0, 0.0, Ease.backOut);
-					//FadeTween_.start();
-					
-					
+					//FadeTween_.start();	
 				}			
 			}
 
@@ -320,8 +341,16 @@ package
 			}
 			
 			// Update score text
+			var Countdown:Number = Timeout_ - ((getTimer() - StartTime_ ) / 1000);
 			ScoreText_.text = "Score: " + CurrentScore_ + ", Target: " + TargetScore_ 
-			+ ", Time: " + Math.floor((getTimer() - StartTime_ )/1000);
+			+ ", Time: " + 
+			Math.floor(
+				Countdown
+				);
+				
+			if(!TransitionTween_.active) {
+				if (Countdown < 0) timeoutHappened();
+			}
 		}
 	}
 
