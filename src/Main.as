@@ -9,12 +9,13 @@ import net.flashpunk.FP;
 		{
 			super(320, 240, 60, false);
 			FP.screen.scale = 2;
-			FP.console.enable();
+			//FP.console.enable();
 		}
 		
 		override public function init():void
 		{
 			trace("FlashPunk has started successfully!");
+
 			FP.world = new ServerWorld();
 			super.init();
 		}

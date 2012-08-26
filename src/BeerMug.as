@@ -1,5 +1,7 @@
 package  
 {
+	import net.flashpunk.FP;
+	import flash.display.InteractiveObject;
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Spritemap;
 	import net.flashpunk.graphics.TiledImage;
@@ -20,9 +22,13 @@ package
 		private var FillTween_:VarTween;
 		private var MoveTween_:LinearMotion;
 		private var BeingTweened_:Boolean;
+		public var PerviousY:Number;
+		private var VeloctiyY:Number = 10;
+		
 		
 		public var FillLevel:int;
 		public var BeerType:String;
+		
 		
 		public function BeerMug() 
 		{
@@ -38,6 +44,7 @@ package
 			
 			BeerType = "empty";
 			FillLevel = 0;
+			PerviousY = 0;
 			
 			type = "mug";
 			
@@ -56,7 +63,8 @@ package
 		
 		public function moveDone():void
 		{
-			visible = false;
+			//visible = false;
+			VeloctiyY = 100;
 		}
 		
 		public function beerFilled():void 
@@ -77,7 +85,10 @@ package
 		
 		public function sendDownBar():void
 		{
-			MoveTween_.setMotion(x, y, 220, y, 0.5);
+			// Adjust motion x and time for how far down the bar it already is.
+			var TimeDuration:Number = (235 - x) / (235 - 70);
+			
+			MoveTween_.setMotion(x, y, 235, y, TimeDuration);
 			MoveTween_.start();
 		}
 		
@@ -85,8 +96,12 @@ package
 		{
 			if(MoveTween_.active) {
 				x = MoveTween_.x;
-				y = MoveTween_.y;
+				//y = MoveTween_.y;				
 			}
+			
+			PerviousY = y;
+			y += VeloctiyY * FP.elapsed;
+			
 			super.update();
 		}
 		
