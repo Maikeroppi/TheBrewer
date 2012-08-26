@@ -81,6 +81,8 @@ package
 			FillTween_.tween(this, "FillLevel", 1.0, 0.75);
 			BeingTweened_ = true;
 			BeerType = Type;
+			
+			//BrewerWorld.FillBeerSound.play();
 		}
 		
 		public function sendDownBar():void
@@ -90,6 +92,8 @@ package
 			
 			MoveTween_.setMotion(x, y, 235, y, TimeDuration);
 			MoveTween_.start();
+			
+			BrewerWorld.SlideSound.play();
 		}
 		
 		override public function update():void

@@ -118,6 +118,8 @@ package
 			FadeTween_.tween(0.3, 0xffffffff, 0xfffffff, 1.0, 0.0001);
 			FadeTween_.start();
 			
+			BrewerWorld.GotBeerSound.play();
+			
 			if (BeerGlass.BeerType == LikedBeerType_) {
 				return true;
 			} else {

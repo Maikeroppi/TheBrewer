@@ -16,7 +16,7 @@ import net.flashpunk.FP;
 		{
 			trace("FlashPunk has started successfully!");
 
-			FP.world = new ServerWorld();
+			FP.world = new BrewerWorld();
 			super.init();
 		}
 	}	

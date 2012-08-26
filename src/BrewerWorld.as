@@ -6,18 +6,20 @@ package
 	import net.flashpunk.Entity;
 	import net.flashpunk.graphics.Image;
 	import net.flashpunk.graphics.Text;
+	import net.flashpunk.Sfx;
 	import net.flashpunk.Tween;
 	import net.flashpunk.tweens.misc.ColorTween;
 	import net.flashpunk.tweens.misc.VarTween;
 	import net.flashpunk.World;
 	import net.flashpunk.utils.Input;
 	import net.flashpunk.utils.Ease;
+	import net.flashpunk.utils.Key;
 	
 	/**
 	 * ...
 	 * @author Maikeroppi
 	 */
-	public class ServerWorld extends World 
+	public class BrewerWorld extends World 
 	{
 		[Embed(source="../TastingRoomBackground.png")]
 		public static const TastingRoomBackground:Class;
@@ -40,6 +42,23 @@ package
 		
 		[Embed(source = "../Server.png")]
 		public static const ServerImage:Class;
+		
+		// Sound effects
+		[Embed(source = "../BrokeGlass.mp3")]
+		private static const BrokeGlassSoundEmbed_:Class;
+		public static const BrokeGlassSound:Sfx = new Sfx(BrokeGlassSoundEmbed_);
+		
+		[Embed(source = "../FillBeer.mp3")]
+		private static const FillBeerSoundEmbed_:Class;
+		public static const FillBeerSound:Sfx = new Sfx(FillBeerSoundEmbed_);
+		
+		[Embed(source = "../GotBeer.mp3")]
+		private static const GotBeerSoundEmbed_:Class;
+		public static const GotBeerSound:Sfx = new Sfx(GotBeerSoundEmbed_);
+				
+		[Embed(source = "../Slide.mp3")]
+		private static const SlideSoundEmbed_:Class;
+		public static const SlideSound:Sfx = new Sfx(SlideSoundEmbed_);
 		
 		public var CurrentTime:Number;
 		private var TimeoutTween:Tween;
@@ -76,8 +95,11 @@ package
 		
 		private var Timeout_:int;
 			
-		public function ServerWorld() 
+		public function BrewerWorld() 
 		{
+			// Lower the volume for sound effects
+			FP.volume = 0.5;
+			
 			BackgroundEntity_ = new Entity(0, 0, new Image(TastingRoomBackground));
 			add(BackgroundEntity_);
 			
@@ -266,6 +288,9 @@ package
 		
 		override public function update():void 
 		{
+			if (Input.released(Key.M)) {
+				FP.volume = 0.0;
+			}
 			updateCollision();
 			super.update();
 		}
@@ -350,6 +375,7 @@ package
 				if (Mug.collide("floor", Mug.x, Mug.y)) { 
 					CurrentScore_ -= 1;
 					remove(Mug);
+					BrewerWorld.BrokeGlassSound.play();
 					trace("Score: " + CurrentScore_);
 				}
 			}
