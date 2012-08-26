@@ -16,10 +16,10 @@ package
 		
 		[Embed(source = "../Hopbro.png")]
 		public static const HopbroImageEmbed:Class;
-		
+				
 		[Embed(source = "../Stoutdude.png")]
 		public static const StoutdudeImageEmbed:Class;
-				
+						
 		[Embed(source = "../Pilsnerguy.png")]
 		public static const PilsnerguyImageEmbed:Class;
 		
@@ -35,23 +35,7 @@ package
 		
 		public function Customer() 
 		{
-			var RandNum:int = FP.rand(3); //Math.floor(Math.random() * 3);
-			switch(RandNum) {
-				case 0:
-					CustImage_ = new Image(HopbroImageEmbed);
-					LikedBeerType_ = "ipa";
-					break;
-				case 1:
-					CustImage_ = new Image(StoutdudeImageEmbed);
-					LikedBeerType_ = "stout";
-					break;
-					
-				default:
-					CustImage_ = new Image(PilsnerguyImageEmbed);
-					LikedBeerType_ = "pils";
-					break;
-			}
-			graphic = CustImage_;
+			
 			
 			MoveTween_ = new LinearMotion(moveDone);
 			addTween(MoveTween_);
@@ -60,6 +44,24 @@ package
 			addTween(FadeTween_);
 			
 			OldX_ = OldY_ = 0;
+		}
+		
+		public function SetBeerType(BeerType:String):void
+		{
+			LikedBeerType_ = BeerType;
+			switch(LikedBeerType_) {
+			case "ipa":
+				graphic = new Image(HopbroImageEmbed);
+			break;
+			case "stout":
+				graphic = new Image(StoutdudeImageEmbed);
+			break;
+			case "pils":
+				graphic = new Image(PilsnerguyImageEmbed);
+			break;
+			default:
+				trace("Unknown BeerType in Customer.SetBeerType!");
+			}
 		}
 		
 		public function slideCustomer():void

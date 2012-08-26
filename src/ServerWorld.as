@@ -25,9 +25,9 @@ package
 		[Embed(source = "../HomebrewBackground.png")]
 		public static const HomebrewBackground:Class;
 		
-		[Embed(source = "../GameOverScreen.png")]
-		public static const GameOverScreen:Class;
-		public var GameOverEntity:Entity;
+		[Embed(source="../Blackscreen.png")]
+		public static const TransitionScreen:Class;
+		public var TransitionEntity:Entity;
 		
 		[Embed(source = "../RedTap.png")]
 		public static const RedTapImage:Class;
@@ -54,8 +54,6 @@ package
 		private var CustomerTween_:Tween;
 		private var Customer_:Customer;
 		
-		
-		
 		private var TheBar_:Entity;
 		private var TheFloor_:Entity;
 		
@@ -69,13 +67,17 @@ package
 		private var ServerEntity_:Entity;
 		
 		private var StartTime_:int;
+		private var NumBeers_:int;
+		
+		private var TransitionText_:Text;
+		private var TransitionTextEntity_:Entity;
 			
 		public function ServerWorld() 
 		{
 			BackgroundEntity_ = new Entity(0, 0, new Image(TastingRoomBackground));
 			add(BackgroundEntity_);
 			
-			GameOverEntity = new Entity(0, 0, new Image(GameOverScreen));
+			TransitionEntity = new Entity(0, 0, new Image(TransitionScreen));
 			
 			// Initialize all the stuff, but don't add; this is done in changeLevel
 			RedTap_ = new Entity(70, 80, new Image(RedTapImage));
@@ -108,6 +110,13 @@ package
 			ScoreEntity_ = new Entity(0, 220, ScoreText_);
 			ServerEntity_ = new Entity(0, 47, new Image(ServerImage));
 			
+			TransitionText_ = new Text("", 0, 0);
+			TransitionText_.color = 0xffffffff;
+			TransitionText_.size = 20;
+			TransitionTextEntity_ = new Entity(0, 0, TransitionText_);
+			
+			NumBeers_ = 0;
+			
 			
 			// seed random generator
 			FP.randomizeSeed();
@@ -120,15 +129,17 @@ package
 			if (LevelName == "Homebrew") {
 				add(RedTap_);
 				add(BlackTap_);
+				NumBeers_ = 2;
 				CustomerTween_ = new Tween(4, Tween.PERSIST, addCustomer);
 			} else if (LevelName == "TastingRoom") {
 				add(RedTap_);
 				add(BlackTap_);
 				add(YellowTap_);
+				NumBeers_ = 3;
 				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
 			}
 			
-			TimeoutTween = new Tween(60, Tween.PERSIST, timeoutHappened);
+			TimeoutTween = new Tween(40, Tween.PERSIST, timeoutHappened);
 			
 			// This stuff is in every level
 			addTween(CustomerTween_);
@@ -161,7 +172,16 @@ package
 			CustomerTween_.cancel();
 			
 			removeAll();
-			add(GameOverEntity);
+			if(CurrentScore_ < TargetScore_) {
+				TransitionText_.text = "Game is Over";
+			} else {
+				TransitionText_.text = "Sucess! Next level...";
+			}
+			
+			TransitionText_.x = (FP.screen.width / 2) - (TransitionText_.width / 2);
+			TransitionText_.y = (FP.screen.height / 2) - (TransitionText_.height / 2);
+			add(TransitionEntity);
+			add(TransitionTextEntity_);
 		}
 		
 		public function addCustomer():void 
@@ -172,6 +192,21 @@ package
 			Customer_.x = 330;
 			Customer_.y = 74;
 			Customer_.slideCustomer();
+			
+			var RandNum:int = FP.rand(NumBeers_); //Math.floor(Math.random() * 3);
+			switch(RandNum) {
+				case 0:
+					Customer_.SetBeerType("ipa");
+					break;
+				case 1:
+					Customer_.SetBeerType("stout");
+					break;
+					
+				case 2:
+					Customer_.SetBeerType("pils");
+					break;
+			}
+						
 			add(Customer_);
 			
 			CustomerTween_.start();
