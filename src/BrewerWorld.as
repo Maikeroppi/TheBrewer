@@ -1,6 +1,7 @@
 package  
 {
 	import Customer;
+	import flash.events.TextEvent;
 	import flash.utils.getTimer;
 	import net.flashpunk.FP;
 	import net.flashpunk.Entity;
@@ -104,6 +105,9 @@ package
 		private var TransitionTextEntity_:Entity;
 		private var TransitionTween_:Tween;
 		
+		private var LevelText_:Text;
+		private var LevelTextEntity_:Entity;
+		
 		private var Timeout_:int;
 			
 		public function BrewerWorld() 
@@ -165,6 +169,9 @@ package
 			
 			NumBeers_ = 0;
 			
+			LevelText_ = new Text("", 0, 0);
+			LevelText_.color = 0xffffffff;
+			LevelTextEntity_ = new Entity(150, 0, LevelText_);
 			
 			// seed random generator
 			FP.randomizeSeed();
@@ -190,6 +197,7 @@ package
 				TargetScore_ = 10;
 				Timeout_ = 40;
 				BackgroundEntity_.graphic = new Image(HomebrewBackground);
+				LevelText_.text = "Level: Homebrew";
 			} else if (LevelName == "TastingRoom") {
 				add(RedTap_);
 				add(BlackTap_);
@@ -199,6 +207,7 @@ package
 				Timeout_ = 40;
 				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
 				BackgroundEntity_.graphic = new Image(TastingRoomBackground);
+				LevelText_.text = "Level: Tasting Room";
 			} else if (LevelName == "Microbrewery") {
 				add(RedTap_);
 				add(BlackTap_);
@@ -210,6 +219,7 @@ package
 				Timeout_ = 60;
 				CustomerTween_ = new Tween(2, Tween.PERSIST, addCustomer);
 				BackgroundEntity_.graphic = new Image(MicrobreweryBackground);
+				LevelText_.text = "Level: Microbrewery";
 			}
 			
 			//TimeoutTween = new Tween(Timeout_, Tween.PERSIST, timeoutHappened);
@@ -222,6 +232,7 @@ package
 			add(ScoreEntity_);
 			add(ServerEntity_);
 			add(TheBar_);
+			add(LevelTextEntity_);
 			
 			// Initialize scores	
 			CurrentScore_ = 0;
